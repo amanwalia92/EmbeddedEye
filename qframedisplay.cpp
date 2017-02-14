@@ -1,0 +1,52 @@
+#include "qframedisplay.h"
+#include <QDebug>
+
+QFrameDisplay::QFrameDisplay(int type)
+{
+
+    mType = type;
+
+    if(type == PAN_DISPLAY)
+    {
+        this->setWindowTitle("Panoramic View");
+        this->setFixedHeight(PAN_HEIGHT);
+        this->setFixedWidth(PAN_WIDTH);
+        this->setMouseTracking(true);
+        this->setCursor(Qt::CrossCursor);
+    }
+    else if (type == FOVEAL_DISPLAY)
+    {
+        this->setWindowTitle("Foveal View");
+        this->setFixedHeight(FOVEAL_HEIGHT);
+        this->setFixedWidth(FOVEAL_WIDTH);
+    }
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QFrameDisplay::mouseMoveEvent(QMouseEvent *ev){
+
+    if(mType == PAN_DISPLAY) // only the pan view will be able to do this
+    {
+        QPoint currentMousePos = ev->pos();
+
+        if (ev->x() <= this->width() && ev->x() >= 0)
+        {
+            if (ev->y() <= this->height() && ev->y() >= 0)
+            {
+                emit sendMousePosition(currentMousePos);
+            }
+        }
+    }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QFrameDisplay::mousePressEvent(QMouseEvent *ev){
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QFrameDisplay::receiveFrameCaptured(cv::Mat *frm){
+
+    //qDebug() << "Here";
+    this->setPixmap(QPixmap::fromImage(QImage(frm->data, frm->cols, frm->rows,frm->step, QImage::Format_RGB888)));
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
