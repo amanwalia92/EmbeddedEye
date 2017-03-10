@@ -16,40 +16,95 @@ SOURCES += main.cpp\
         qembeddedeye.cpp \
     qcamerasettingsdialog.cpp \
     qframedisplay.cpp \
-    qframecapturethread.cpp
+    qframecapturethread.cpp \
+    qimagesaver.cpp \
+    qtrackingsettingsdialog.cpp \
+    qstreamingsettings.cpp \
+    qstreamer.cpp \
+    Motor_Sources/ControllerAPI.cpp \
+    Motor_Sources/ControlTables.cpp \
+    Motor_Sources/Dynamixel.cpp \
+    Motor_Sources/DynamixelController.cpp \
+    Motor_Sources/DynamixelSimpleAPI.cpp \
+    Motor_Sources/DynamixelTools.cpp \
+    Motor_Sources/minitraces.cpp \
+    Motor_Sources/SerialPort.cpp \
+    Motor_Sources/SerialPortLinux.cpp \
+    Motor_Sources/Servo.cpp \
+    Motor_Sources/ServoDynamixel.cpp \
+    Motor_Sources/ServoMX.cpp \
+    Motor_Sources/Utils.cpp
 
 HEADERS  += qembeddedeye.h \
     qcamerasettingsdialog.h \
     qframedisplay.h \
     qmaindefinitions.h \
     qopencvincludables.h \
-    qframecapturethread.h
+    qframecapturethread.h \
+    qimagesaver.h \
+    qtrackingsettingsdialog.h \
+    qstreamingsettings.h \
+    qstreamer.h \
+    Motor_Headers/ControllerAPI.h \
+    Motor_Headers/ControlTables.h \
+    Motor_Headers/ControlTablesDynamixel.h \
+    Motor_Headers/Dynamixel.h \
+    Motor_Headers/DynamixelController.h \
+    Motor_Headers/DynamixelSimpleAPI.h \
+    Motor_Headers/DynamixelTools.h \
+    Motor_Headers/minitraces.h \
+    Motor_Headers/minitraces_conf.h \
+    Motor_Headers/SerialPort.h \
+    Motor_Headers/SerialPortLinux.h \
+    Motor_Headers/Servo.h \
+    Motor_Headers/ServoDynamixel.h \
+    Motor_Headers/ServoMX.h \
+    Motor_Headers/Utils.h
 
 FORMS    += qembeddedeye.ui \
-    qcamerasettingsdialog.ui
+    qcamerasettingsdialog.ui \
+    qtrackingsettingsdialog.ui \
+    qstreamingsettings.ui
 
 
-INCLUDEPATH += C:\opencv\opencv\build\include
-INCLUDEPATH += C:\opencv\opencv\build\include\opencv
-INCLUDEPATH += C:\opencv\opencv\build\include\opencv2
+INCLUDEPATH += /usr/local/include/
+INCLUDEPATH += /usr/local/include/opencv
+INCLUDEPATH += /usr/local/include/opencv2
 
-LIBS += -LC:\opencv\opencv\build\x64\vc12\lib \
-            -lopencv_calib3d2411 \
-            -lopencv_contrib2411 \
-            -lopencv_core2411 \
-            -lopencv_features2d2411 \
-            -lopencv_flann2411 \
-            -lopencv_gpu2411 \
-            -lopencv_highgui2411 \
-            -lopencv_imgproc2411 \
-            -lopencv_legacy2411 \
-            -lopencv_ml2411 \
-            -lopencv_nonfree2411 \
-            -lopencv_objdetect2411 \
-            -lopencv_ocl2411 \
-            -lopencv_photo2411 \
-            -lopencv_stitching2411 \
-            -lopencv_superres2411 \
-            -lopencv_ts2411 \
-            -lopencv_video2411 \
-            -lopencv_videostab2411
+LIBS += -L/usr/local/lib -L/usr/local/cuda-8.0/lib64 \
+            -lopencv_contrib \
+            -lopencv_core \
+            -lopencv_features2d \
+            -lopencv_flann \
+            -lopencv_gpu \
+            -lopencv_highgui \
+            -lopencv_imgproc \
+            -lopencv_legacy \
+            -lopencv_ml \
+            -lopencv_nonfree \
+            -lopencv_objdetect \
+            -lopencv_ocl \
+            -lopencv_photo \
+            -lopencv_stitching \
+            -lopencv_superres \
+            -lopencv_ts \
+            -lopencv_video \
+            -lopencv_videostab \
+            -lcufft \
+            -lcublas \
+            -lnpps \
+            -lnppi \
+            -lnppc \
+            -lcudart \
+            -latomic \
+            -ltbb \
+            -lrt \
+            -lpthread \
+            -lm \
+            -ldl \
+
+# Tell qmake to use pkg-config to find QtGStreamer.
+CONFIG += link_pkgconfig
+
+PKGCONFIG +=  gstreamer-1.0
+LIBS += -llockdev

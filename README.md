@@ -1,2 +1,1 @@
-# QEmbeddedEye
-This is the main application for this project.
+This is Project Source code for ENG 4K project. 

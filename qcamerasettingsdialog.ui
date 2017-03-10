@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>466</width>
+    <width>473</width>
     <height>112</height>
    </rect>
   </property>
@@ -48,6 +48,9 @@
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
         <widget class="QLabel" name="label_3">
+         <property name="toolTip">
+          <string>Time to sleep between each frame grab. Default, zero, means that the next frame will be captured without any sleep time.</string>
+         </property>
          <property name="text">
           <string>Time Between Frames (ms):</string>
          </property>
@@ -55,6 +58,9 @@
        </item>
        <item>
         <widget class="QLabel" name="label_4">
+         <property name="toolTip">
+          <string>Time to sleep between each frame grab. Default, zero, means that the next frame will be captured without any sleep time.</string>
+         </property>
          <property name="text">
           <string>Time Between Frames (ms):</string>
          </property>
@@ -67,20 +73,26 @@
        <item>
         <widget class="QSpinBox" name="spinBox_panFrameTime">
          <property name="minimum">
-          <number>20</number>
+          <number>0</number>
          </property>
          <property name="maximum">
           <number>500</number>
+         </property>
+         <property name="value">
+          <number>0</number>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QSpinBox" name="spinBox_fovFrameTime">
          <property name="minimum">
-          <number>20</number>
+          <number>0</number>
          </property>
          <property name="maximum">
           <number>500</number>
+         </property>
+         <property name="value">
+          <number>0</number>
          </property>
         </widget>
        </item>

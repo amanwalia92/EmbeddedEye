@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>636</width>
-    <height>170</height>
+    <width>590</width>
+    <height>270</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,37 +20,63 @@
       <property name="title">
        <string>Main Actions</string>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QPushButton" name="pushButton_startPanoramicCam">
-         <property name="text">
-          <string>Start Pan</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QPushButton" name="pushButton_startPanoramicCam">
+           <property name="text">
+            <string>Start Pan</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_startFovealCam">
+           <property name="text">
+            <string>Start Foveal</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_startFovealCam">
-         <property name="text">
-          <string>Start Foveal</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
+         <item>
+          <widget class="QPushButton" name="pushButton_doTracking">
+           <property name="text">
+            <string>Do Tracking</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_StartStopStreaming">
+           <property name="text">
+            <string>Start Streaming</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_doTracking">
-         <property name="text">
-          <string>Do Tracking</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox_moveMotors">
-         <property name="text">
-          <string>Move Motors</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QPushButton" name="pushButton_captureImages">
+           <property name="text">
+            <string>Capture Images</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBox_moveMotors">
+           <property name="text">
+            <string>Move Motors</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -97,6 +123,78 @@
          </item>
         </layout>
        </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Pan FPS(approx.):</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_panFPSDisplay">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Foveal FPS(approx.):</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_fovFPSDisplay">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>IP Address and Port Selected:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_StreamingStatus">
+           <property name="text">
+            <string>192.168.0.123 | 5000</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Status of Image Saver:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_imageSaverStatus">
+           <property name="text">
+            <string>Status of Image Saver</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
      </widget>
     </item>
@@ -107,7 +205,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>636</width>
+     <width>590</width>
      <height>26</height>
     </rect>
    </property>
@@ -123,6 +221,7 @@
     </property>
     <addaction name="actionCamera_Settings"/>
     <addaction name="actionTracking_Settings"/>
+    <addaction name="actionStreaming_Settings"/>
    </widget>
    <widget class="QMenu" name="menuAbout">
     <property name="title">
@@ -179,6 +278,11 @@
   <action name="actionFoveal">
    <property name="text">
     <string>Foveal</string>
+   </property>
+  </action>
+  <action name="actionStreaming_Settings">
+   <property name="text">
+    <string>Streaming Settings</string>
    </property>
   </action>
  </widget>

@@ -16,21 +16,21 @@ class QFrameDisplay : public QLabel
 public:
     QFrameDisplay(int type);
 
-
 protected:
     void mouseMoveEvent(QMouseEvent *ev) override;
     void mousePressEvent(QMouseEvent *ev) override;
-
 
 public slots:
     void receiveFrameCaptured(cv::Mat*);
 
 signals:
     void sendMousePosition(QPoint);
+    void sendFrameDisplayed(void);
 
 private:
     int mType = -1;
-
+    QPixmap mPixMap;
+    int mNum = 0;
 
 };
 

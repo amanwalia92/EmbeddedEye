@@ -8,18 +8,25 @@ QEmbeddedEye::QEmbeddedEye(QWidget *parent) :
     QMainWindow(parent),
     mPanDisplay(NULL),
     mFovDisplay(NULL),
-    mPanCamNumber(0), mFovCamNumber(1),
-    mPanFrameTime(20),mFovFrameTime(20),
+    mPanCamNumber(1), mFovCamNumber(0),
+    mPanFrameTime(0),mFovFrameTime(0),
+    mPanDisplayTime(0), mFovDisplayTime(0),
     ui(new Ui::QEmbeddedEye)
 {
-
     // create the camera capturing threads
     mPanCameraCapture = new QFrameCaptureThread(mPanCamNumber, mPanFrameTime, this);
-    mPanCameraCapture->openCamera(mPanCamNumber); // try opening the camera
+    connect( mPanCameraCapture, SIGNAL(finished()), mPanCameraCapture, SLOT(deleteLater()));
 
     mFovCameraCapture = new QFrameCaptureThread(mFovCamNumber, mFovFrameTime, this);
-    mFovCameraCapture->openCamera(mFovCamNumber); // try opening the camera
+    connect( mFovCameraCapture, SIGNAL(finished()), mFovCameraCapture, SLOT(deleteLater()));
 
+
+    stream = new QStreamer();
+    if(!stream->createElements())
+    {
+        QMessageBox::warning(this, "GStreamer failed", "GStreamer failed to create pipeline elements!");
+        return;
+    }
 
     ui->setupUi(this);
 }
@@ -35,7 +42,13 @@ void QEmbeddedEye::closeEvent(QCloseEvent*){
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void QEmbeddedEye::terminateAllThreads(){
-    mPanCameraCapture->terminate();
+    mPanCameraCapture->quit();
+    mFovCameraCapture->quit();
+
+    if(stream)
+    {
+        stream->stopStreaming();
+    }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void QEmbeddedEye::on_actionCamera_Settings_triggered()
@@ -50,37 +63,40 @@ void QEmbeddedEye::on_actionCamera_Settings_triggered()
 
     if(mCamSettings.result() == QDialog::Accepted) // if accepted, set the new camera settings
     {
-        //qDebug() << "---------------\nmCamSettins.getFovCameraNumber():" << mCamSettings.getFovCameraNumber() <<
-        //            " mCamSettins.getFovFrameTime():" << mCamSettings.getFovFrameTime();
-        //
-        //qDebug() << "mCamSettins.getPanCameraNumber():" << mCamSettings.getPanCameraNumber() <<
-        //            " mCamSettins.getPanFrameTime():" << mCamSettings.getPanFrameTime();
-
-
         if(mCamSettings.getPanCameraNumber() == mCamSettings.getFovCameraNumber())
         {
             QMessageBox::warning(this, "Same Camera Number", "Please select different camera numbers for each camera.");
             return;
         }
 
+        // set the camera numbers
         mPanCamNumber = mCamSettings.getPanCameraNumber();
         mFovCamNumber = mCamSettings.getFovCameraNumber();
 
+        // set the inter frame time if necessary
         mPanFrameTime = mCamSettings.getPanFrameTime();
         mFovFrameTime = mCamSettings.getFovFrameTime();
 
-        // try reopening the pan camera
-        mPanCameraCapture->terminate();
-        ui->pushButton_startPanoramicCam->setText("Start Pan"); mPanPlaying = false;
-        mPanCameraCapture->openCamera(mPanCamNumber); mPanCameraCapture->setTimeToSleep(mPanFrameTime);
+        mPanCameraCapture->setTimeToSleep(mPanFrameTime);
+        mFovCameraCapture->setTimeToSleep(mFovFrameTime);
 
-        // try reopening the foveal camera
-        mFovCameraCapture->terminate();
-        ui->pushButton_startFovealCam->setText("Start Foveal"); mFovPlaying = false;
-        mFovCameraCapture->openCamera(mFovCamNumber); mFovCameraCapture->setTimeToSleep(mFovFrameTime);
 
     }
 
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QEmbeddedEye::on_actionTracking_Settings_triggered()
+{
+    QTrackingSettingsDialog mTrackSettings;
+
+    mTrackSettings.setModal(true);
+    mTrackSettings.exec();
+
+    if(mTrackSettings.result() == QDialog::Accepted) // if accepted, set the new camera settings
+    {
+
+        qDebug() << "Accepted tracking settings";
+    }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void QEmbeddedEye::on_actionPanoramic_triggered()
@@ -93,6 +109,9 @@ void QEmbeddedEye::on_actionPanoramic_triggered()
         mPanDisplay = new QFrameDisplay(PAN_DISPLAY);
         // connect the mouse movement events and mouse click events
         connect(mPanDisplay, SIGNAL(sendMousePosition(QPoint)), this, SLOT(receiveAndSetMousePos(QPoint)));
+        // connect frame displayed image
+        connect(mPanDisplay, SIGNAL(sendFrameDisplayed()), this, SLOT(receivePanFrameDisplayed()));
+
 
         // connect the camera
         connect(mPanCameraCapture, SIGNAL(sendFrame(cv::Mat*)),mPanDisplay, SLOT(receiveFrameCaptured(cv::Mat*)));
@@ -108,6 +127,8 @@ void QEmbeddedEye::on_actionFoveal_triggered()
     }
     else{
         mFovDisplay = new QFrameDisplay(FOVEAL_DISPLAY);
+        // connect frame displayed image
+        connect(mFovDisplay, SIGNAL(sendFrameDisplayed()), this, SLOT(receiveFovFrameDisplayed()));
 
         // connect the camera
         connect(mFovCameraCapture, SIGNAL(sendFrame(cv::Mat*)), mFovDisplay, SLOT(receiveFrameCaptured(cv::Mat*)));
@@ -129,52 +150,145 @@ void QEmbeddedEye::on_actionExit_triggered()
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void QEmbeddedEye::on_pushButton_startPanoramicCam_clicked()
 {
-    if(mPanCameraCapture->isCameraOpen())
+    if(!mPanPlaying)
     {
-        if(mPanPlaying)
+        mPanCameraCapture->openCamera(mPanCamNumber);
+
+        if(mPanCameraCapture->isCameraOpen())
         {
-            mPanCameraCapture->terminate();
-            ui->pushButton_startPanoramicCam->setText("Start Pan");
+            mPanCameraCapture->start();
+            mPanPlaying = true;
+            ui->pushButton_startPanoramicCam->setEnabled(false);
         }
         else
         {
-            mPanCameraCapture->start();
-            ui->pushButton_startPanoramicCam->setText("Stop Pan");
+            QMessageBox::warning(this, "Panoramic Camera Failed to Open", "Unable to Open Panoramic Camera: " + QString::number(mPanCamNumber) + ". Restart application and select another camera number!");
         }
-        mPanPlaying = !mPanPlaying;
-
-    }
-    else
-    {
-        QMessageBox::warning(this, "Panoramic Camera Failed to Open", "Unable to Open Panoramic Camera: " + QString::number(mPanCamNumber));
     }
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void QEmbeddedEye::on_pushButton_startFovealCam_clicked()
 {
-    if(mFovCameraCapture->isCameraOpen())
+    if(!mFovPlaying)
     {
-        if(mFovPlaying)
+        mFovCameraCapture->openCamera(mFovCamNumber);
+
+        if(mFovCameraCapture->isCameraOpen())
         {
-            mFovCameraCapture->terminate();
-            ui->pushButton_startFovealCam->setText("Start Foveal");
+
+            QMessageBox::StandardButton rpns;
+            rpns = QMessageBox::question(this, "Display Foveal Feed", "Displaying this foveal feed will not allow for feed to be streamed. "
+                                                                      "If you want to stream then select 'No'. If you want to display "
+                                                                      "the feed, click 'Yes'.",
+                                         QMessageBox::Yes | QMessageBox::No
+                                        );
+
+            if(rpns == QMessageBox::Yes)
+            {
+                mFovCameraCapture->start();
+                mFovPlaying = true;
+                ui->pushButton_startFovealCam->setEnabled(false);
+            }
         }
         else
         {
-            mFovCameraCapture->start();
-            ui->pushButton_startFovealCam->setText("Stop Foveal");
+            QMessageBox::warning(this, "Foveal Camera Failed to Open", "Unable to Open Foveal Camera: " + QString::number(mFovCamNumber) + ". Restart application and select another camera number!");
         }
-        mFovPlaying = !mFovPlaying;
-
-    }
-    else
-    {
-        QMessageBox::warning(this, "Foveal Camera Failed to Open", "Unable to Open Foveal Camera: " + QString::number(mFovCamNumber));
     }
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void QEmbeddedEye::on_pushButton_doTracking_clicked()
 {
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QEmbeddedEye::on_pushButton_captureImages_clicked()
+{
+    // we might not need the image saving functionality
+    //qDebug() << "on_pushButton_captureImages_clicked";
+    //if(!thread)
+    //{
+    //    thread = new QThread( );
+    //    task  = new QImageSaver(100);
+    //    task->moveToThread(thread);
+    //
+    //    connect( thread, SIGNAL(started()), task, SLOT(startSaving()));
+    //    connect( task, SIGNAL(finishedSaving()), thread, SLOT(quit()) );
+    //
+    //    connect(task, SIGNAL(sendStatus(QString)), this, SLOT(receiveImageSaverStatus(QString)));
+    //
+    //    connect(task, SIGNAL(finishedSaving()), this, SLOT(receiveFinishedSavingFrames()));
+    //
+    //    //automatically delete thread and task object when work is done:
+    //    //connect( thread, SIGNAL(finished()), task, SLOT(deleteLater()) );
+    //    //connect( thread, SIGNAL(finished()), thread, SLOT(deleteLater()) );
+    //    thread->start();
+    //}
+    //else
+    //{
+    //
+    //}
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QEmbeddedEye::receiveImageSaverStatus(QString str)
+{
+    ui->label_imageSaverStatus->setText(str);
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QEmbeddedEye::receivePanFrame(cv::Mat*frm){
+    // qDebug() << "receive Pan Frame!";
+    if(task){
+        task->setFrameCaptured(frm);
+    }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QEmbeddedEye::receiveFinishedSavingFrames(){
+    // not yet implemented
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QEmbeddedEye::receivePanFrameDisplayed(void){
+
+    double ellapsedTime = CLOCKS_PER_SEC/(clock() - mPanDisplayTime);
+    ui->label_panFPSDisplay->setText(QString::number(ellapsedTime));
+    mPanDisplayTime = clock();
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QEmbeddedEye::receiveFovFrameDisplayed(void){
+
+
+    double ellapsedTime = CLOCKS_PER_SEC/(clock() - mFovDisplayTime);
+    ui->label_fovFPSDisplay->setText(QString::number(ellapsedTime));
+    mFovDisplayTime = clock();
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QEmbeddedEye::on_actionStreaming_Settings_triggered()
+{
+    QStreamingSettings mStreamSettings;
+
+    mStreamSettings.setModal(true);
+    mStreamSettings.exec();
+
+    if(mStreamSettings.result() == QDialog::Accepted)
+    {
+        ui->label_StreamingStatus->setText(mStreamSettings.getAddress() /* + " | " + mStreamSettings.getPortNumber() */);
+
+        stream->setCameraID(mFovCamNumber);
+        stream->addClient(mStreamSettings.getAddress().toUtf8().constData()/*, mStreamSettings.getPortNumber().toUtf8().constData()*/);
+
+
+    } // 10.24.191.215
+
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QEmbeddedEye::on_pushButton_StartStopStreaming_clicked()
+{
+
+    if(stream)
+    {
+        stream->initialize();
+        stream->startStreaming();
+
+    }
 
 }

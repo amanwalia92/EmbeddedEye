@@ -10,5 +10,9 @@
 #define PAN_DISPLAY 0
 #define FOVEAL_DISPLAY 1
 
+#define TRACKING_METHOD_VIOLAJONES "Face Detector"
+#define TRACKING_METHOD_VIOLAJONES_TEMPLATEMATCHING "Face Detector + Template Matching"
+#define TRACKING_METHOD_MOTION "Motion Detection"
+
 
 #endif // QMAINDEFINITIONS_H

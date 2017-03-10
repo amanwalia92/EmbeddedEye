@@ -17,8 +17,10 @@ QFrameDisplay::QFrameDisplay(int type)
     else if (type == FOVEAL_DISPLAY)
     {
         this->setWindowTitle("Foveal View");
+        this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         this->setFixedHeight(FOVEAL_HEIGHT);
         this->setFixedWidth(FOVEAL_WIDTH);
+        // probably we should keep this resizable for the foveal display
     }
 
 }
@@ -47,6 +49,29 @@ void QFrameDisplay::mousePressEvent(QMouseEvent *ev){
 void QFrameDisplay::receiveFrameCaptured(cv::Mat *frm){
 
     //qDebug() << "Here";
-    this->setPixmap(QPixmap::fromImage(QImage(frm->data, frm->cols, frm->rows,frm->step, QImage::Format_RGB888)));
+    if(this->isVisible())
+    {
+        if(frm != NULL && frm->data)
+        {
+            //cv::cvtColor(*frm,*frm, CV_BGR2RGB); // convert to rgb
+            //if(mType == PAN_DISPLAY)
+            //{
+            //    mPixMap = QPixmap::fromImage(QImage(frm->data, frm->cols, frm->rows,frm->step, QImage::Format_RGB888));
+            //    this->setPixmap(mPixMap);
+            //}
+            //else if(mType == FOVEAL_DISPLAY)
+            //{
+            //    mPixMap = QPixmap::fromImage(QImage(frm->data, frm->cols, frm->rows,frm->step, QImage::Format_RGB888));
+            //    //this->setPixmap(mPixMap.scaled(this->width(), this->height())); // use Qt::KeepAspectRatio to maintain aspect ratio
+            //}
+
+
+            mPixMap = QPixmap::fromImage(QImage(frm->data, frm->cols, frm->rows,frm->step, QImage::Format_RGB888));
+            this->setPixmap(mPixMap);
+            emit sendFrameDisplayed();
+        }
+    }
+    // qDebug() << "Receiving Frame "<<mType << " num:" << mNum++;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
+

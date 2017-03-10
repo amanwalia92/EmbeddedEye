@@ -17,6 +17,7 @@ public:
     void openCamera(int camNum);
     void setTimeToSleep(int ts);
     bool isCameraOpen();
+    void terminateCamera();
 
 
 protected:

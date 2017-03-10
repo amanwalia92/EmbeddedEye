@@ -20,11 +20,19 @@ void QFrameCaptureThread::openCamera(int camNum){
     if(mCam->isOpened()){
         mCam->release();
     }
+
     mCamNumber = camNum;
     mCam->open(mCamNumber);
+
+    mCam->set(CV_CAP_PROP_FOURCC, CV_FOURCC('M', 'J', 'P', 'G'));
+    mCam->set(CV_CAP_PROP_FRAME_WIDTH, 640);
+    mCam->set(CV_CAP_PROP_FRAME_HEIGHT, 480);
+
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 bool QFrameCaptureThread::isCameraOpen(){
+
+
     return mCam->isOpened();
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,16 +43,28 @@ void QFrameCaptureThread::setTimeToSleep(int ts){
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void QFrameCaptureThread::run(){
 
-    if(!mCam->isOpened()){
-        //QMessageBox::warning(NULL, "Camera Not Opened","Failed to Open Camera:" + QString::number(mCamNumber));
-        // qDebug() << "failed to open camera: " + QString::number(mCamNumber);
-        return;
-    }
 
     while(true){
 
-        mCam->read(mOriginalFrame);
-        emit sendFrame(&mOriginalFrame);
-        msleep(mTimeToSleep); // sleep for some time
+
+        if(mCam && mCam->isOpened()){
+
+            mCam->read(mOriginalFrame);
+
+            emit sendFrame(&mOriginalFrame);
+
+            if(mTimeToSleep>0)
+            {
+                 msleep(mTimeToSleep); // sleep for some time
+            }
+        }
+
+    }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QFrameCaptureThread::terminateCamera(){
+
+    if(mCam->isOpened()){
+        mCam->release();
     }
 }
