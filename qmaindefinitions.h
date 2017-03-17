@@ -14,5 +14,8 @@
 #define TRACKING_METHOD_VIOLAJONES_TEMPLATEMATCHING "Face Detector + Template Matching"
 #define TRACKING_METHOD_MOTION "Motion Detection"
 
+#define PAN_MOTOR_ID 1
+#define TILT_MOTOR_ID 2
+
 
 #endif // QMAINDEFINITIONS_H

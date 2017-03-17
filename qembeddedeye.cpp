@@ -20,8 +20,23 @@ QEmbeddedEye::QEmbeddedEye(QWidget *parent) :
     mFovCameraCapture = new QFrameCaptureThread(mFovCamNumber, mFovFrameTime, this);
     connect( mFovCameraCapture, SIGNAL(finished()), mFovCameraCapture, SLOT(deleteLater()));
 
+    motor_lookup = new MotorMatrix();
+    motor_lookup->loadMotorTargetsLUT();
 
     stream = new QStreamer();
+    motor =  new DynamixelSimpleAPI(SERVO_MX12W);
+
+    motor->setTorqueEnabled(PAN_MOTOR_ID,10);
+    motor->setTorqueEnabled(TILT_MOTOR_ID,10);
+
+    std::string deviceName = "/dev/ttyUSB0";
+
+    if (motor->connect(deviceName, 1) == 0)
+    {
+        std::cerr << "> Failed to open a serial link for our SimpleAPI! Exiting..." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     if(!stream->createElements())
     {
         QMessageBox::warning(this, "GStreamer failed", "GStreamer failed to create pipeline elements!");
@@ -109,6 +124,7 @@ void QEmbeddedEye::on_actionPanoramic_triggered()
         mPanDisplay = new QFrameDisplay(PAN_DISPLAY);
         // connect the mouse movement events and mouse click events
         connect(mPanDisplay, SIGNAL(sendMousePosition(QPoint)), this, SLOT(receiveAndSetMousePos(QPoint)));
+        connect(mPanDisplay, SIGNAL(sendClickedMousePosition(QPoint)), this, SLOT(receiveClickedMousePos(QPoint)));
         // connect frame displayed image
         connect(mPanDisplay, SIGNAL(sendFrameDisplayed()), this, SLOT(receivePanFrameDisplayed()));
 
@@ -139,7 +155,16 @@ void QEmbeddedEye::on_actionFoveal_triggered()
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void QEmbeddedEye::receiveAndSetMousePos(QPoint pos){
 
-    ui->label_XYPos->setText(QString::number(pos.x()) + " , " + QString::number(pos.y()));
+    //ui->label_XYPos->setText(QString::number(pos.x()) + " , " + QString::number(pos.y()));
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+void QEmbeddedEye::receiveClickedMousePos(QPoint pos){
+
+    float p,t;
+    motor_lookup->getPanTiltFromCoordinates(pos.x(),pos.y(),&p,&t);
+    ui->label_XYPos->setText(QString::number(p) + " , " + QString::number(t));
+    motor->setGoalPosition(PAN_MOTOR_ID,(int)p,30);
+    motor->setGoalPosition(TILT_MOTOR_ID,(int)t,30);
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void QEmbeddedEye::on_actionExit_triggered()

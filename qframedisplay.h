@@ -25,6 +25,7 @@ public slots:
 
 signals:
     void sendMousePosition(QPoint);
+    void sendClickedMousePosition(QPoint);
     void sendFrameDisplayed(void);
 
 private:

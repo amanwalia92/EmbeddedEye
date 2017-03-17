@@ -11,7 +11,8 @@
 #include <qmaindefinitions.h>
 #include <qframecapturethread.h>
 #include <qimagesaver.h>
-
+#include <MotorMatrix.h>
+#include <./Motor_Headers/DynamixelSimpleAPI.h>
 
 namespace Ui {
 class QEmbeddedEye;
@@ -38,6 +39,8 @@ private slots:
     void on_actionFoveal_triggered();
 
     void receiveAndSetMousePos(QPoint);
+
+    void receiveClickedMousePos(QPoint);
 
     void on_actionExit_triggered();
 
@@ -90,8 +93,10 @@ private:
     QImageSaver *task = NULL;
 
     QStreamer * stream = NULL;
-
+    MotorMatrix *motor_lookup;
     void terminateAllThreads();
+    //Object
+    DynamixelSimpleAPI *motor = NULL;
 
 };
 

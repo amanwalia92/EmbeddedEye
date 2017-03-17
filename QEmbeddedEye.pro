@@ -33,7 +33,8 @@ SOURCES += main.cpp\
     Motor_Sources/Servo.cpp \
     Motor_Sources/ServoDynamixel.cpp \
     Motor_Sources/ServoMX.cpp \
-    Motor_Sources/Utils.cpp
+    Motor_Sources/Utils.cpp \
+    MotorMatrix.cpp
 
 HEADERS  += qembeddedeye.h \
     qcamerasettingsdialog.h \
@@ -59,7 +60,8 @@ HEADERS  += qembeddedeye.h \
     Motor_Headers/Servo.h \
     Motor_Headers/ServoDynamixel.h \
     Motor_Headers/ServoMX.h \
-    Motor_Headers/Utils.h
+    Motor_Headers/Utils.h \
+    MotorMatrix.h
 
 FORMS    += qembeddedeye.ui \
     qcamerasettingsdialog.ui \

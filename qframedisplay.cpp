@@ -43,6 +43,18 @@ void QFrameDisplay::mouseMoveEvent(QMouseEvent *ev){
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
 void QFrameDisplay::mousePressEvent(QMouseEvent *ev){
+    if(mType == PAN_DISPLAY) // only the pan view will be able to do this
+    {
+        QPoint currentMousePos = ev->pos();
+
+        if (ev->x() <= this->width() && ev->x() >= 0)
+        {
+            if (ev->y() <= this->height() && ev->y() >= 0)
+            {
+                emit sendClickedMousePosition(currentMousePos);
+            }
+        }
+    }
 
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////
