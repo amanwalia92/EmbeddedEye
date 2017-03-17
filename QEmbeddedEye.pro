@@ -110,3 +110,6 @@ CONFIG += link_pkgconfig
 
 PKGCONFIG +=  gstreamer-1.0
 LIBS += -llockdev
+
+DISTFILES += \
+    points.txt
