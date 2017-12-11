@@ -13,6 +13,7 @@ Our goals were:
 ## Project Images
 ![alt text](Image1.png "Project CAD design")
 ![alt text](Image2.png "Hardware Model")
+![alt text](Image3.jpg "Tracking")
 
 ## Authors
 * **Amanpreet Walia** 
