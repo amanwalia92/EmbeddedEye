@@ -9,7 +9,7 @@ Our goals were:
  * Wide field of view surveillance combined with high resolution video feed at key regions of interest
  * Rapid target focus
  * Smooth camera movements to mimic smooth pursuit movement
- * An independent system that can stream its content Function autonomously
+ * An independent system that can stream its content 
 ## Project Images
 ![alt text](Image1.png "Project CAD design")
 ![alt text](Image2.png "Hardware Model")
