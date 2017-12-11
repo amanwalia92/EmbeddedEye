@@ -5,7 +5,6 @@ Our goals were:
  * To develop a low power embedded system suitable for the remote application
  * To make the system light enough to be deployable on small UAVs
  * To develop a generic system which can be deployable in diverse applications
- * To be able to meet these goals, our requirements consisted of:
  * Wide field of view surveillance combined with high resolution video feed at key regions of interest
  * Rapid target focus
  * Smooth camera movements to mimic smooth pursuit movement
