@@ -1,4 +1,4 @@
-##EmbeddedEye
+## EmbeddedEye
 The original goal of the Embedded Eye was to offer a wide field of view surveillance of a scene while, at the same time, providing high-resolution images of key regions of interest.
 Our goals were:
     To mimic biological visual systems for improving upon conventional imaging technology
