@@ -10,6 +10,11 @@ Our goals were:
     * Rapid target focus
     * Smooth camera movements to mimic smooth pursuit movement
     * An independent system that can stream its content Function autonomously
+    
+    * Item 1
+* Item 2
+ * Item 2a
+ * Item 2b
 ## Project Images
 ![alt text](Image1.png "Project CAD design")
 ![alt text](Image2.png "Hardware Model")
